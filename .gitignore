@@ -1,0 +1,6 @@
+out
+lib
+include/GLFW
+include/glm
+include/GLEW
+
