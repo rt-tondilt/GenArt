@@ -28,7 +28,6 @@ Camera cam;
 void initWalls() {
     floorVAO = createQuad(glm::vec3(0.22, 0.22, 0.22), 50);
     paintingVAO = createQuad(glm::vec3(0.50, 0.50, 0.50), 4);
-
 }
 
 GLuint createQuad(glm::vec3 color, float s) {
@@ -157,20 +156,25 @@ int main(int argc, char *argv[]) {
     glCullFace(GL_BACK);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+
+
+    BluePainting blue(cam.projection, cam.view);
+    blue.position = glm::vec3(2.f, 0.f, -7.f);
+
     RedPainting red(cam.projection, cam.view);
     red.position = glm::vec3(-8.f, 0.f, -7.f);
-    red.angle = 90.f;
+
 
     while (!glfwWindowShouldClose(win)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         drawHangar();
-        drawPaintings();
+
         //testing
         shader.end();
         red.render(paintingVAO);
+        blue.render(paintingVAO);
         shader.begin();
         //
-        shader.uniformMatrix4fv("projectionMatrix", cam.projection);
         shader.uniformMatrix4fv("viewMatrix", cam.view);
         glfwSwapBuffers(win);
         glfwPollEvents();
