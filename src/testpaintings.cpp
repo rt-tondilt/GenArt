@@ -2,10 +2,20 @@
 #include "testpaintings.h"
 
 RedPainting::RedPainting(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) :
+    // projectionMatrix and viewMatrix could possibly be in a uniform buffer, maybe i'll look at that
+    // this is the important part: change it to get different shaders
     Painting(shader_prog("shaders/basic.vert.glsl", "shaders/redpainting.frag.glsl"), projectionMatrix, viewMatrix)
     {
+        /////////////
+        //this setup call MUST be inside the derived class: it doesn't work if it's in the base class
+        //for whatever reason
+        //setup compiles the shaders, creates the program, attaches and links the shaders
         pshader.setup();
+        /////////////
+        //begin just calls glUseUniform, and end calls glUseUniform(0)
         pshader.begin();
+
+        //this uniform stays constant so it doesn't have to be changed after initial setup
         pshader.uniformMatrix4fv("projectionMatrix", projectionMatrix);
         pshader.end();
     };
@@ -16,6 +26,9 @@ void RedPainting::render(GLuint VAO) {
     ms.push(glm::mat4(1.0));
 
     //set up the shaders, uniforms
+    //rendering is as usual, but beginning and ending their own shaders, as well as updating necessary uniforms
+    //in this case im passing in a VAO to render because I don't want each painting to have its own VAO,
+    //but in principle you can store the objects VAO inside it as well, and it'll probably be more convenient
     pshader.begin();
     pshader.uniformMatrix4fv("viewMatrix", viewMatrix);
 

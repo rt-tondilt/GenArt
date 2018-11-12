@@ -1,6 +1,8 @@
 // ---------------------------- Includes -------------------------- //
 #include <stdlib.h>         // C++ standard library
 #include <stack>            // We use the standard C++ stack implementation to create model matrix stacks
+#include <memory>
+#include <vector>            // We use the standard C++ stack implementation to create model matrix stacks
 #include <unistd.h>         // Threading
 #include <stdio.h>          // Input/Output
 #include <GLEW/glew.h>      // OpenGL Extension Wrangler -
@@ -14,16 +16,22 @@
 
 // --------------- Forward declarations ------------- //
 GLuint createQuad(glm::vec3 color, float s);
+std::vector<Painting*> makePaintings();
 // --- Load the shaders declared in glsl files in the project folder ---//
-shader_prog shader("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
+shader_prog basicshader("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
 GLuint floorVAO, paintingVAO;
 Camera cam;
 
-/**
-*   *Implement the methods: initChopper, createCube and drawChopper. Read the
-*   comments for guidelines and explanation. There exist very similar methods
-*   for the hangar walls for you to follow.
-*/
+std::vector<Painting*> makePaintings() {
+
+    Painting *blue = new BluePainting(cam.projection, cam.view);
+    blue->position = glm::vec3(-8.f, 0.f, -7.f);
+    Painting *red = new RedPainting(cam.projection, cam.view);
+    red->position = glm::vec3(2.f, 0.f, -7.f);
+
+    std::vector<Painting*> vec = {blue, red};
+    return vec;
+}
 
 void initWalls() {
     floorVAO = createQuad(glm::vec3(0.22, 0.22, 0.22), 50);
@@ -38,14 +46,11 @@ GLuint createQuad(glm::vec3 color, float s) {
                             -s,  s, 0.0
                         };
 
-    //In this array we define faces for the triangles within the walls.
-    //Each set of three vertices defines one triangle.
     GLubyte indices[] = {
                             0, 1, 2,
                             0, 2, 3
                         };
 
-    //Colors for the 4 vertices
     GLfloat colors[] = {
                             color[0], color[1], color[2],
                             color[0], color[1], color[2],
@@ -57,18 +62,8 @@ GLuint createQuad(glm::vec3 color, float s) {
     glGenVertexArrays(1, &vertexArrayHandle);
     glBindVertexArray(vertexArrayHandle);
 
-    //Here we set up VBO-s for coordinates and colors of the vertices.
-    shader.attribute3fv("position", vertices, 12);
-    shader.attribute3fv("color", colors, 12);
-
-    /**
-    * To use VBO, you need to perform the following steps:
-    *   1. Generate a name for the buffer.
-    *   2. Bind (activate) the buffer.
-    *   3. Store data in the buffer.
-    *   4. Use the buffer to render data.
-    *   5. Destroy the buffer.
-    */
+    basicshader.attribute3fv("position", vertices, 12);
+    basicshader.attribute3fv("color", colors, 12);
 
     // First step. We create a handle for our buffer
     GLuint vboHandle;
@@ -83,17 +78,20 @@ GLuint createQuad(glm::vec3 color, float s) {
     return vertexArrayHandle;
 }
 
-void drawHangar() {
+void drawWorld() {
+    basicshader.begin();
+    basicshader.uniformMatrix4fv("viewMatrix", cam.view);
     std::stack<glm::mat4> ms;
     ms.push(glm::mat4(1.0));
     ms.push(ms.top()); //Floor
         ms.top() = glm::rotate(ms.top(), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
         ms.top() = glm::translate(ms.top(), glm::vec3(0.0, 0.0, -10.0));
 
-        shader.uniformMatrix4fv("modelMatrix", ms.top());
+        basicshader.uniformMatrix4fv("modelMatrix", ms.top());
         glBindVertexArray(floorVAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
     ms.pop();
+    basicshader.end();
 }
 
 void drawPaintings() {
@@ -103,7 +101,7 @@ void drawPaintings() {
     ms.push(ms.top());
         ms.top() = glm::translate(ms.top(), glm::vec3(-8 + 10*i, 0.0, -7.0));
 
-        shader.uniformMatrix4fv("modelMatrix", ms.top());
+        basicshader.uniformMatrix4fv("modelMatrix", ms.top());
         glBindVertexArray(paintingVAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
     ms.pop();
@@ -131,7 +129,6 @@ int main(int argc, char *argv[]) {
     }
 
     glfwMakeContextCurrent(win);
-
     glewExperimental = GL_TRUE;
     GLenum status = glewInit();
 
@@ -145,10 +142,10 @@ int main(int argc, char *argv[]) {
     printf ("OpenGL version supported %s\n", version);
     glfwSetKeyCallback(win, key_callback);
 
-    shader.setup();
-    shader.begin();
-    shader.uniformMatrix4fv("projectionMatrix", cam.projection);
-    shader.uniformMatrix4fv("viewMatrix", cam.view);
+    basicshader.setup();
+    basicshader.begin();
+    basicshader.uniformMatrix4fv("projectionMatrix", cam.projection);
+    basicshader.uniformMatrix4fv("viewMatrix", cam.view);
 
     initWalls();
     glEnable(GL_DEPTH_TEST);
@@ -157,28 +154,26 @@ int main(int argc, char *argv[]) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 
-
-    BluePainting blue(cam.projection, cam.view);
-    blue.position = glm::vec3(2.f, 0.f, -7.f);
-
-    RedPainting red(cam.projection, cam.view);
-    red.position = glm::vec3(-8.f, 0.f, -7.f);
+    //create our "paintings": they are initialized inside this function
+    std::vector<Painting*> paintings = makePaintings();
 
 
     while (!glfwWindowShouldClose(win)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        drawHangar();
 
-        //testing
-        shader.end();
-        red.render(paintingVAO);
-        blue.render(paintingVAO);
-        shader.begin();
+        drawWorld();
+        //draw our paintings
+        for (int i = 0; i<paintings.size(); i++) {
+            paintings[i]->render(paintingVAO);
+        }
         //
-        shader.uniformMatrix4fv("viewMatrix", cam.view);
+        //
         glfwSwapBuffers(win);
         glfwPollEvents();
         usleep(1000);
+    }
+    for (int i = 0; i<paintings.size(); i++) {
+        delete paintings[i];
     }
 
     glfwTerminate();
