@@ -13,23 +13,34 @@
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
 #include "testpaintings.h"
 
-
-// --------------- Forward declarations ------------- //
+// all functions defined in main.cppp //
 GLuint createQuad(glm::vec3 color, float s);
-std::vector<Painting*> makePaintings();
+std::vector<std::unique_ptr<Painting>> makePaintings();
+void initWalls();
+void drawWorld();
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 // --- Load the shaders declared in glsl files in the project folder ---//
+
+//our globals
 shader_prog basicshader("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
 GLuint floorVAO, paintingVAO;
 Camera cam;
 
-std::vector<Painting*> makePaintings() {
+std::vector<std::unique_ptr<Painting>> makePaintings() {
 
-    Painting *blue = new BluePainting(cam.projection, cam.view);
+    //just making and placing them manually...
+    auto blue = std::make_unique<BluePainting>(cam.projection, cam.view);
     blue->position = glm::vec3(-8.f, 0.f, -7.f);
-    Painting *red = new RedPainting(cam.projection, cam.view);
+
+    auto red = std::make_unique<RedPainting>(cam.projection, cam.view);
     red->position = glm::vec3(2.f, 0.f, -7.f);
 
-    std::vector<Painting*> vec = {blue, red};
+
+    //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them
+    std::vector<std::unique_ptr<Painting>> vec;
+    vec.push_back(std::move(blue));
+    vec.push_back(std::move(red));
+
     return vec;
 }
 
@@ -73,11 +84,11 @@ GLuint createQuad(glm::vec3 color, float s) {
     // Third step. We store the vertex indexes in the VBO.
     // These define the faces of the triangles, which make up the cube/
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLfloat)*12, indices, GL_STATIC_DRAW);
-    //We return handle to vertex array. Step 4 takes place in method drawHangar.
-    //Step 5 we skip, as all our assets have the same lifetime as rest of the program.
+    //We return handle to vertex array.
     return vertexArrayHandle;
 }
 
+//probably replace this by a container with all non-special geometry to be drawn later(clear out separate global geometry VAOS)
 void drawWorld() {
     basicshader.begin();
     basicshader.uniformMatrix4fv("viewMatrix", cam.view);
@@ -94,20 +105,6 @@ void drawWorld() {
     basicshader.end();
 }
 
-void drawPaintings() {
-    std::stack<glm::mat4> ms;
-    ms.push(glm::mat4(1.0));
-    for (float i = 0.; i < 3.; i++) {
-    ms.push(ms.top());
-        ms.top() = glm::translate(ms.top(), glm::vec3(-8 + 10*i, 0.0, -7.0));
-
-        basicshader.uniformMatrix4fv("modelMatrix", ms.top());
-        glBindVertexArray(paintingVAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
-    ms.pop();
-
-    }
-}
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -122,7 +119,6 @@ int main(int argc, char *argv[]) {
     }
 
     win = glfwCreateWindow(800, 600, "Generative Art Gallery", NULL, NULL);
-
     if (!win) {
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -154,27 +150,23 @@ int main(int argc, char *argv[]) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 
-    //create our "paintings": they are initialized inside this function
-    std::vector<Painting*> paintings = makePaintings();
+    //create a vector containing pointers to our "paintings": they are initialized inside this makePaintings function
+    auto paintings = makePaintings();
 
 
     while (!glfwWindowShouldClose(win)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         drawWorld();
-        //draw our paintings
-        for (int i = 0; i<paintings.size(); i++) {
-            paintings[i]->render(paintingVAO);
+        for (const auto &p : paintings) {
+            p->render(paintingVAO);
         }
-        //
-        //
+
         glfwSwapBuffers(win);
         glfwPollEvents();
         usleep(1000);
     }
-    for (int i = 0; i<paintings.size(); i++) {
-        delete paintings[i];
-    }
+    //clear it out
 
     glfwTerminate();
     exit(EXIT_SUCCESS);

@@ -7,8 +7,8 @@ RedPainting::RedPainting(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) :
     Painting(shader_prog("shaders/basic.vert.glsl", "shaders/redpainting.frag.glsl"), projectionMatrix, viewMatrix)
     {
         /////////////
-        //this setup call MUST be inside the derived class: it doesn't work if it's in the base class
-        //for whatever reason
+        //this setup call MUST be inside the derived class constructor:
+        //it doesn't work if it's in the base class for whatever reason
         //setup compiles the shaders, creates the program, attaches and links the shaders
         pshader.setup();
         /////////////
@@ -35,6 +35,7 @@ void RedPainting::render(GLuint VAO) {
     ms.push(ms.top());
         ms.top() = glm::translate(ms.top(), position);
         ms.top() = glm::rotate(ms.top(), glm::radians(angle), glm::vec3(0., 1., 0.));
+        //maybe we can even set up the modelMatrix only once in constructor as well if they don't move around
         pshader.uniformMatrix4fv("modelMatrix", ms.top());
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
