@@ -9,12 +9,14 @@
 
 #include "camera.h"
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
+#include "testpaintings.h"
+
 
 // --------------- Forward declarations ------------- //
-GLuint createQuad(glm::vec3 color);
+GLuint createQuad(glm::vec3 color, float s);
 // --- Load the shaders declared in glsl files in the project folder ---//
 shader_prog shader("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
-GLuint floorVAO;
+GLuint floorVAO, paintingVAO;
 Camera cam;
 
 /**
@@ -24,11 +26,12 @@ Camera cam;
 */
 
 void initWalls() {
-    floorVAO = createQuad(glm::vec3(0.22, 0.22, 0.22));
+    floorVAO = createQuad(glm::vec3(0.22, 0.22, 0.22), 50);
+    paintingVAO = createQuad(glm::vec3(0.50, 0.50, 0.50), 4);
+
 }
 
-GLuint createQuad(glm::vec3 color) {
-    float s = 50.;
+GLuint createQuad(glm::vec3 color, float s) {
     GLfloat vertices[] = {
                             -s, -s, 0.0,
                              s, -s, 0.0,
@@ -94,6 +97,21 @@ void drawHangar() {
     ms.pop();
 }
 
+void drawPaintings() {
+    std::stack<glm::mat4> ms;
+    ms.push(glm::mat4(1.0));
+    for (float i = 0.; i < 3.; i++) {
+    ms.push(ms.top());
+        ms.top() = glm::translate(ms.top(), glm::vec3(-8 + 10*i, 0.0, -7.0));
+
+        shader.uniformMatrix4fv("modelMatrix", ms.top());
+        glBindVertexArray(paintingVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+    ms.pop();
+
+    }
+}
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
@@ -127,8 +145,9 @@ int main(int argc, char *argv[]) {
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported %s\n", version);
     glfwSetKeyCallback(win, key_callback);
-    shader.use();
 
+    shader.setup();
+    shader.begin();
     shader.uniformMatrix4fv("projectionMatrix", cam.projection);
     shader.uniformMatrix4fv("viewMatrix", cam.view);
 
@@ -138,9 +157,21 @@ int main(int argc, char *argv[]) {
     glCullFace(GL_BACK);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    RedPainting red(cam.projection, cam.view);
+    red.position = glm::vec3(-8.f, 0.f, -7.f);
+    red.angle = 90.f;
+
     while (!glfwWindowShouldClose(win)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         drawHangar();
+        drawPaintings();
+        //testing
+        shader.end();
+        red.render(paintingVAO);
+        shader.begin();
+        //
+        shader.uniformMatrix4fv("projectionMatrix", cam.projection);
+        shader.uniformMatrix4fv("viewMatrix", cam.view);
         glfwSwapBuffers(win);
         glfwPollEvents();
         usleep(1000);

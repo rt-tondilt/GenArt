@@ -60,9 +60,6 @@ GLuint compile(GLuint type, std::string source) {
     return shader;
 }
 
-/**
- * Default shaders.
- */
 const GLchar *default_vertex_shader =
     "#version 120\n"
     "varying vec4 vertex_color\n;"
@@ -71,7 +68,7 @@ const GLchar *default_vertex_shader =
     "    vertex_color = gl_Color;\n"
     "}";
 
-const GLchar *default_fragment_shader = // Only supports coloring. Textures require custom stuff.
+const GLchar *default_fragment_shader =
     "#version 120\n"
     "varying vec4 vertex_color;\n"
     "void main() {\n"
@@ -83,14 +80,27 @@ shader_prog::shader_prog(const char* vertex_shader_filename, const char* fragmen
     f_source = fragment_shader_filename == NULL ? std::string((const char*)default_fragment_shader) : get_file_contents(fragment_shader_filename);
 }
 
-void shader_prog::use() {
+
+//first thing that gets called after constructor
+void shader_prog::setup() {
+    //compile
     vertex_shader = compile(GL_VERTEX_SHADER, v_source);
     fragment_shader = compile(GL_FRAGMENT_SHADER, f_source);
+    //identifying GLUint for program
     prog = glCreateProgram();
+    //attach
     glAttachShader(prog, vertex_shader);
     glAttachShader(prog, fragment_shader);
+    //link
     glLinkProgram(prog);
+}
+
+void shader_prog::begin() {
     glUseProgram(prog);
+}
+
+void shader_prog::end() {
+    glUseProgram(0);
 }
 
 void shader_prog::free() {
