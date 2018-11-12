@@ -1,7 +1,7 @@
 #include <stack>
 #include "testpaintings.h"
 
-RedPainting::RedPainting(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) :
+RedPainting::RedPainting(const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix) :
     // projectionMatrix and viewMatrix could possibly be in a uniform buffer, maybe i'll look at that
     // this is the important part: change it to get different shaders
     Painting(shader_prog("shaders/basic.vert.glsl", "shaders/redpainting.frag.glsl"), projectionMatrix, viewMatrix)
@@ -43,7 +43,7 @@ void RedPainting::render(GLuint VAO) {
     pshader.end();
 };
 
-BluePainting::BluePainting(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) :
+BluePainting::BluePainting(const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix) :
     Painting(shader_prog("shaders/basic.vert.glsl", "shaders/bluepainting.frag.glsl"), projectionMatrix, viewMatrix)
     {
         pshader.setup();

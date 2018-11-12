@@ -1,8 +1,8 @@
 // ---------------------------- Includes -------------------------- //
 #include <stdlib.h>         // C++ standard library
 #include <stack>            // We use the standard C++ stack implementation to create model matrix stacks
-#include <memory>
-#include <vector>            // We use the standard C++ stack implementation to create model matrix stacks
+#include <memory>           // Smart pointers
+#include <vector>
 #include <unistd.h>         // Threading
 #include <stdio.h>          // Input/Output
 #include <GLEW/glew.h>      // OpenGL Extension Wrangler -
@@ -27,14 +27,12 @@ GLuint floorVAO, paintingVAO;
 Camera cam;
 
 std::vector<std::unique_ptr<Painting>> makePaintings() {
-
     //just making and placing them manually...
     auto blue = std::make_unique<BluePainting>(cam.projection, cam.view);
     blue->position = glm::vec3(-8.f, 0.f, -7.f);
 
     auto red = std::make_unique<RedPainting>(cam.projection, cam.view);
     red->position = glm::vec3(2.f, 0.f, -7.f);
-
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them
     std::vector<std::unique_ptr<Painting>> vec;
@@ -149,13 +147,12 @@ int main(int argc, char *argv[]) {
     glCullFace(GL_BACK);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-
-    //create a vector containing pointers to our "paintings": they are initialized inside this makePaintings function
+    //create a vector containing (unique) pointers to our "paintings": they are initialized inside this makePaintings function
     auto paintings = makePaintings();
-
 
     while (!glfwWindowShouldClose(win)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        cam.view = glm::translate(cam.view, glm::vec3(sin(glfwGetTime())/4, 0, 0));
 
         drawWorld();
         for (const auto &p : paintings) {
