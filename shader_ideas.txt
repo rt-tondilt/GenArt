@@ -3,5 +3,3 @@ Moving voronoi diagram shader
 (generated?) texture-layered 2d effect
 convincing 2d smoke effect
 dithering shader?
-
-
