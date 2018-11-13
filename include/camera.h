@@ -1,3 +1,4 @@
+#pragma once
 #include <glm/ext.hpp>
 
 class Camera {
@@ -8,3 +9,4 @@ class Camera {
         Camera();
         Camera(glm::mat4 projection);
 };
+

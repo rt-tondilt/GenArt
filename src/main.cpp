@@ -9,33 +9,40 @@
 #include <GLFW/glfw3.h>     // Windows and input
 #include <glm/glm.hpp>      // OpenGL math library
 
-#include "camera.h"
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
 #include "testpaintings.h"
+#include "camera.h"
 
-// all functions defined in main.cppp //
-GLuint createQuad(glm::vec3 color, float s);
-std::vector<std::unique_ptr<Painting>> makePaintings();
-void initWalls();
-void drawWorld();
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-// --- Load the shaders declared in glsl files in the project folder ---//
+// so far i've only added to this globals header globals which need to be visible across multiple files
+// other globals are defined below
+#include "globals.h"
+using std::vector;
+using std::unique_ptr;
+using std::make_unique;
 
 //our globals
 shader_prog basicshader("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
 GLuint floorVAO, paintingVAO;
-Camera cam;
 
-std::vector<std::unique_ptr<Painting>> makePaintings() {
+// all functions defined in main.cpp //
+GLuint createQuad(glm::vec3 color, float s);
+vector<unique_ptr<Painting>> makePaintings();
+void initWalls();
+void drawWorld();
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+vector<unique_ptr<Painting>> makePaintings() {
     //just making and placing them manually...
-    auto blue = std::make_unique<BluePainting>(cam.projection, cam.view);
+    auto blue = make_unique<BluePainting>();
     blue->position = glm::vec3(-8.f, 0.f, -7.f);
 
-    auto red = std::make_unique<RedPainting>(cam.projection, cam.view);
+    auto red = make_unique<RedPainting>();
     red->position = glm::vec3(2.f, 0.f, -7.f);
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them
-    std::vector<std::unique_ptr<Painting>> vec;
+    vector<unique_ptr<Painting>> vec;
+    vec.reserve(30);//should be enough to avoid resizing
+
     vec.push_back(std::move(blue));
     vec.push_back(std::move(red));
 

@@ -1,10 +1,9 @@
 #include <stack>
 #include "testpaintings.h"
 
-RedPainting::RedPainting(const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix) :
-    // projectionMatrix and viewMatrix could possibly be in a uniform buffer, maybe i'll look at that
-    // this is the important part: change it to get different shaders
-    Painting(shader_prog("shaders/basic.vert.glsl", "shaders/redpainting.frag.glsl"), projectionMatrix, viewMatrix)
+RedPainting::RedPainting() :
+    // calls the base class constructor: this is the important part: change your shaders here
+    Painting(shader_prog("shaders/basic.vert.glsl", "shaders/redpainting.frag.glsl"))
     {
         /////////////
         //this setup call MUST be inside the derived class constructor:
@@ -43,8 +42,8 @@ void RedPainting::render(GLuint VAO) {
     pshader.end();
 };
 
-BluePainting::BluePainting(const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix) :
-    Painting(shader_prog("shaders/basic.vert.glsl", "shaders/bluepainting.frag.glsl"), projectionMatrix, viewMatrix)
+BluePainting::BluePainting() :
+    Painting(shader_prog("shaders/basic.vert.glsl", "shaders/bluepainting.frag.glsl"))
     {
         pshader.setup();
         pshader.begin();

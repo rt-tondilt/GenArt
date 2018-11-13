@@ -1,4 +1,5 @@
 #include "camera.h"
+
     Camera::Camera() ://default constructor
         projection(glm::perspective(glm::radians(80.), 4./3., 0.1, 100.)),
         view(glm::lookAt(

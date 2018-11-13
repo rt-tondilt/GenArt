@@ -1,6 +1,6 @@
 #include "shader_util.h"
 #include <glm/glm.hpp>
-/* #include <GLEW/glew.h> */
+#include "globals.h"
 
 class Painting {
 
@@ -11,12 +11,12 @@ class Painting {
         const glm::mat4 &projectionMatrix;
         const glm::mat4 &viewMatrix;
 
-        Painting(shader_prog pshader, const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix) :
+        Painting(shader_prog pshader) :
                     pshader(pshader),
                     position(glm::vec3(0)),
                     angle(0.f),
-                    projectionMatrix(projectionMatrix),
-                    viewMatrix(viewMatrix)
+                    projectionMatrix(cam.projection),
+                    viewMatrix(cam.view)
                     {};
 
         virtual void render(GLuint VAO) =0;

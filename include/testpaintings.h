@@ -5,12 +5,12 @@
 //more details in testpaintings.cpp
 class RedPainting: public Painting {
     public:
-        RedPainting(const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix);
+        RedPainting();
         void render(GLuint VAO);
 };
 
 class BluePainting: public Painting {
     public:
-        BluePainting(const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix);
+        BluePainting();
         void render(GLuint VAO);
 };
