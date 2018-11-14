@@ -18,7 +18,6 @@ class Camera {
 
         Camera();
         Camera(glm::mat4 projection);
-        void translate(float x, float y, float z);
         void initKeyboard();
         void processInput(float dt);
         void updateViewMat();

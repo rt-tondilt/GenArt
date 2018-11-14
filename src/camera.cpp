@@ -19,10 +19,6 @@
             initKeyboard();
         }
 
-    void Camera::translate(float x, float y, float z) {
-        worldpos += glm::vec3(x, y, z);
-    }
-
     void Camera::initKeyboard() {
         keyboard.insert(std::make_pair(GLFW_KEY_W, false));
         keyboard.insert(std::make_pair(GLFW_KEY_A, false));
@@ -65,23 +61,30 @@
         rotation.x -= xdiff*0.1;
         rotation.y -= ydiff*0.1;
 
+        //bounds check
         if (rotation.y > 90.f) rotation.y = 90.f;
         if (rotation.y < -90.f) rotation.y = -90.f;
 
-
-
         float mov = keyboard.at(GLFW_KEY_LEFT_SHIFT) ? dt * runspeed : dt * walkspeed;
+
+        glm::vec3 frontvec(glm::row(view, 2));
+        frontvec.y = 0.f;
+        frontvec = glm::normalize(frontvec);
+        glm::vec3 rightvec(glm::row(view, 0));
+        rightvec.y = 0.f;
+        rightvec = glm::normalize(rightvec);
+
         if (keyboard.at(GLFW_KEY_W)) {
-            translate(0.f, 0.f, -mov);
+            worldpos -= frontvec*mov;
         }
         if (keyboard.at(GLFW_KEY_S)) {
-            translate(0.f, 0.f, mov);
+            worldpos += frontvec*mov;
         }
         if (keyboard.at(GLFW_KEY_A)) {
-            translate(mov, 0.f, 0.f);
+            worldpos -= rightvec*mov;
         }
         if (keyboard.at(GLFW_KEY_D)) {
-            translate(-mov, 0.f, 0.f);
+            worldpos += rightvec*mov;
         }
 
         updateViewMat();
