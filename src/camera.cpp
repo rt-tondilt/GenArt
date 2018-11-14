@@ -18,3 +18,7 @@
                     )
             ) {}
 
+    void Camera::translate(float x, float y, float z) {
+        view = glm::translate(view, glm::vec3(x, y, z));
+    }
+

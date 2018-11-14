@@ -8,5 +8,6 @@ class Camera {
         glm::mat4 view;
         Camera();
         Camera(glm::mat4 projection);
+        void translate(float x, float y, float z);
 };
 
