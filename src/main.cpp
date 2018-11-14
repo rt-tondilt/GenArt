@@ -11,8 +11,8 @@
 
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
 #include "testpaintings.h"
-#include "camera.h"
 #include "input.h"
+#include "camera.h"
 
 // so far i've only added to this globals header globals which need to be visible across multiple files:
 // keyboard and cam
@@ -138,7 +138,6 @@ int main(int argc, char *argv[]) {
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported %s\n", version);
     glfwSetKeyCallback(win, key_callback);
-    initKeyboard();
 
     basicshader.setup();
     basicshader.begin();
@@ -159,7 +158,7 @@ int main(int argc, char *argv[]) {
         currentTime = glfwGetTime();
         dt = (currentTime - lastTime);
         lastTime = currentTime;
-        tickKeyboard(dt);
+        cam.processInput(dt);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         /* cam.translate(sin(glfwGetTime())/4, 0, 0); */
