@@ -1,7 +1,5 @@
-/**
- * MTAT.03.015 Computer Graphics.
- * Shader configuration utility routines.
- */
+#pragma once
+
 #include <string>
 #include <GLEW/glew.h>
 #include "glm/glm.hpp"
@@ -18,8 +16,10 @@ private:
     std::string v_source, f_source;
 public:
     shader_prog(const char* vertex_shader_filename, const char* fragment_shader_filename);
-    void use();
+    void setup();
     void free();
+    void begin();
+    void end();
     operator GLuint();
 
     // Shorthands for glUniform specification
@@ -30,3 +30,5 @@ public:
     void uniformMatrix4fv(const char* name, glm::mat4 matrix);
     void attribute3fv(const char* name, GLfloat* vecArray, int numberOfVertices);
 };
+
+
