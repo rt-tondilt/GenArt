@@ -6,6 +6,8 @@
 class Camera {
 
     public:
+        glm::vec3 worldpos;
+        glm::vec2 rotation;
         glm::mat4 projection;
         glm::mat4 view;
         GLFWwindow *win;
@@ -19,5 +21,6 @@ class Camera {
         void translate(float x, float y, float z);
         void initKeyboard();
         void processInput(float dt);
+        void updateViewMat();
 };
 
