@@ -8,7 +8,11 @@ class Camera {
     public:
         glm::mat4 projection;
         glm::mat4 view;
+        GLFWwindow *win;
+        const float walkspeed = 4.f;
+        const float runspeed = 10.f;
         std::map<int, bool> keyboard;
+        double mx = 0, my = 0;
 
         Camera();
         Camera(glm::mat4 projection);

@@ -124,6 +124,7 @@ int main(int argc, char *argv[]) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+    cam.win = win;
 
     glfwMakeContextCurrent(win);
     glewExperimental = GL_TRUE;
@@ -138,6 +139,7 @@ int main(int argc, char *argv[]) {
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported %s\n", version);
     glfwSetKeyCallback(win, key_callback);
+    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     basicshader.setup();
     basicshader.begin();
@@ -152,8 +154,8 @@ int main(int argc, char *argv[]) {
 
     //create a vector containing (unique) pointers to our "paintings": they are initialized inside this makePaintings function
     auto paintings = makePaintings();
-
     double currentTime, dt, lastTime = 0;
+
     while (!glfwWindowShouldClose(win)) {
         currentTime = glfwGetTime();
         dt = (currentTime - lastTime);
@@ -161,7 +163,6 @@ int main(int argc, char *argv[]) {
         cam.processInput(dt);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        /* cam.translate(sin(glfwGetTime())/4, 0, 0); */
 
         drawWorld();
         for (const auto &p : paintings) {
