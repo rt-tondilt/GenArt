@@ -11,10 +11,12 @@
 
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
 #include "testpaintings.h"
+#include "input.h"
 #include "camera.h"
 
-// so far i've only added to this globals header globals which need to be visible across multiple files
-// other globals are defined below
+// so far i've only added to this globals header globals which need to be visible across multiple files:
+// keyboard and cam
+// other main.cpp only globals are defined below
 #include "globals.h"
 using std::vector;
 using std::unique_ptr;
@@ -29,7 +31,6 @@ GLuint createQuad(glm::vec3 color, float s);
 vector<unique_ptr<Painting>> makePaintings();
 void initWalls();
 void drawWorld();
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 vector<unique_ptr<Painting>> makePaintings() {
     //just making and placing them manually...
@@ -111,11 +112,6 @@ void drawWorld() {
 }
 
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
-}
-
 int main(int argc, char *argv[]) {
     GLFWwindow *win;
 
@@ -128,6 +124,7 @@ int main(int argc, char *argv[]) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+    cam.win = win;
 
     glfwMakeContextCurrent(win);
     glewExperimental = GL_TRUE;
@@ -142,6 +139,7 @@ int main(int argc, char *argv[]) {
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported %s\n", version);
     glfwSetKeyCallback(win, key_callback);
+    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     basicshader.setup();
     basicshader.begin();
@@ -156,10 +154,15 @@ int main(int argc, char *argv[]) {
 
     //create a vector containing (unique) pointers to our "paintings": they are initialized inside this makePaintings function
     auto paintings = makePaintings();
+    double currentTime, dt, lastTime = 0;
 
     while (!glfwWindowShouldClose(win)) {
+        currentTime = glfwGetTime();
+        dt = (currentTime - lastTime);
+        lastTime = currentTime;
+        cam.processInput(dt);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        cam.view = glm::translate(cam.view, glm::vec3(sin(glfwGetTime())/4, 0, 0));
 
         drawWorld();
         for (const auto &p : paintings) {

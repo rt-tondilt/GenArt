@@ -1,3 +1,5 @@
+#pragma once
+
 #include "shader_util.h"
 #include <glm/glm.hpp>
 #include "globals.h"
