@@ -30,13 +30,22 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="include/shader_util.h" />
 		<Unit filename="include/camera.h" />
+		<Unit filename="include/globals.h" />
+		<Unit filename="include/input.h" />
+		<Unit filename="include/painting.h" />
+		<Unit filename="include/shader_util.h" />
+		<Unit filename="include/testpaintings.h" />
 		<Unit filename="shaders/basic.frag.glsl" />
 		<Unit filename="shaders/basic.vert.glsl" />
+		<Unit filename="shaders/bluepainting.frag.glsl" />
+		<Unit filename="shaders/redpainting.frag.glsl" />
 		<Unit filename="src/camera.cpp" />
+		<Unit filename="src/globals.cpp" />
+		<Unit filename="src/input.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Unit filename="src/shader_util.cpp" />
+		<Unit filename="src/testpaintings.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
