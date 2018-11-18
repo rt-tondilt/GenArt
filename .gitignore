@@ -1,8 +1,8 @@
 # Libraries
-lib
-include/GLFW
-include/glm
-include/GLEW
+# lib
+# include/GLFW
+# include/glm
+# include/GLEW
 
 # Build results
 out
