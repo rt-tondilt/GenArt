@@ -1,3 +1,4 @@
+#include "consts.h"
 // ---------------------------- Includes -------------------------- //
 #include <stdlib.h>         // C++ standard library
 #include <stack>            // We use the standard C++ stack implementation to create model matrix stacks
@@ -78,8 +79,9 @@ GLuint createQuad(glm::vec3 color, float s) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexdata), vertexdata, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
 
+    //indexes are defined inside the vertex shader itself with layout specification
     glVertexAttribPointer(
-        0, // positions
+        VERTEX_POSITION_LOC,
         3,                 // number of elements per vertex, here (r,g,b)
         GL_FLOAT,          // the type of each element
         GL_FALSE,          // take our values as-is
@@ -88,7 +90,7 @@ GLuint createQuad(glm::vec3 color, float s) {
     );
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
-        1, // colors (not really needed actually)
+        COLOR_LOC,
         3,
         GL_FLOAT,
         GL_FALSE,
@@ -97,16 +99,13 @@ GLuint createQuad(glm::vec3 color, float s) {
     );
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(
-        2, // uv
+        UV_LOC,
         2,
         GL_FLOAT,
         GL_FALSE,
         8*sizeof(float),
         (const GLvoid*)(6*sizeof(float))
     );
-
-    /* basicshader.attribute3fv("position", vertices, 12); */
-    /* basicshader.attribute3fv("color", colors, 12); */
 
     // First step. We create a handle for our buffer
     glGenBuffers(1, &vboHandle);
@@ -141,7 +140,7 @@ int main(int argc, char *argv[]) {
         exit (EXIT_FAILURE);
     }
 
-    win = glfwCreateWindow(800, 600, "Generative Art Gallery", NULL, NULL);
+    win = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, NULL, NULL);
     if (!win) {
         glfwTerminate();
         exit(EXIT_FAILURE);

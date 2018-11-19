@@ -1,5 +1,4 @@
 #include "camera.h"
-#include "stdio.h"
 
     Camera::Camera() ://default constructor
         projection(glm::perspective(glm::radians(80.), 4./3., 0.1, 100.)),
@@ -28,8 +27,6 @@
     }
 
     void Camera::updateViewMat() {
-        printf("%f, %f\n", rotation.x, rotation.y);
-
         float sinYaw = glm::sin(glm::radians(rotation.x));
         float cosYaw = glm::cos(glm::radians(rotation.x));
         float sinPitch = glm::sin(glm::radians(rotation.y));
