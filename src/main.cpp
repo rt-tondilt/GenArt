@@ -56,11 +56,11 @@ void initWalls() {
 }
 
 GLuint createQuad(glm::vec3 color, float s) {
-    GLfloat vertices[] = {
-                            -s, -s, 0.0,
-                             s, -s, 0.0,
-                             s,  s, 0.0,
-                            -s,  s, 0.0
+    GLfloat vertexdata[] = {
+                            -s, -s, 0.0, color[0], color[1], color[2], 0.f, 1.f,
+                             s, -s, 0.0, color[0], color[1], color[2], 1.f, 1.f,
+                             s,  s, 0.0, color[0], color[1], color[2], 1.f, 0.f,
+                            -s,  s, 0.0, color[0], color[1], color[2], 0.f, 0.f
                         };
 
     GLubyte indices[] = {
@@ -68,28 +68,50 @@ GLuint createQuad(glm::vec3 color, float s) {
                             0, 2, 3
                         };
 
-    GLfloat colors[] = {
-                            color[0], color[1], color[2],
-                            color[0], color[1], color[2],
-                            color[0], color[1], color[2],
-                            color[0], color[1], color[2]
-                        };
-
     GLuint vertexArrayHandle;
     glGenVertexArrays(1, &vertexArrayHandle);
     glBindVertexArray(vertexArrayHandle);
 
-    basicshader.attribute3fv("position", vertices, 12);
-    basicshader.attribute3fv("color", colors, 12);
-
-    // First step. We create a handle for our buffer
     GLuint vboHandle;
     glGenBuffers(1, &vboHandle);
-    // Second step. We bind (activate) this buffer for the OpenGL state machine.
+    glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexdata), vertexdata, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(
+        0, // positions
+        3,                 // number of elements per vertex, here (r,g,b)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        8*sizeof(float),                 // no extra data between each position
+        (const GLvoid*)(0*sizeof(float))                  // offset of first element
+    );
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(
+        1, // colors (not really needed actually)
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        8*sizeof(float),
+        (const GLvoid*)(3*sizeof(float))
+    );
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2, // uv
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        8*sizeof(float),
+        (const GLvoid*)(6*sizeof(float))
+    );
+
+    /* basicshader.attribute3fv("position", vertices, 12); */
+    /* basicshader.attribute3fv("color", colors, 12); */
+
+    // First step. We create a handle for our buffer
+    glGenBuffers(1, &vboHandle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboHandle);
-    // Third step. We store the vertex indexes in the VBO.
-    // These define the faces of the triangles, which make up the cube/
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLfloat)*12, indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLfloat)*6, indices, GL_STATIC_DRAW);
     //We return handle to vertex array.
     return vertexArrayHandle;
 }
@@ -165,6 +187,7 @@ int main(int argc, char *argv[]) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         drawWorld();
+
         for (const auto &p : paintings) {
             p->render(paintingVAO);
         }

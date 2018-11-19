@@ -48,8 +48,14 @@ BluePainting::BluePainting() :
         pshader.setup();
         pshader.begin();
         pshader.uniformMatrix4fv("projectionMatrix", projectionMatrix);
+        pshader.uniform1f("time", (float)glfwGetTime());
         pshader.end();
     };
+
+void BluePainting::updateUniforms() {
+    pshader.uniformMatrix4fv("viewMatrix", viewMatrix);
+    pshader.uniform1f("time", (float)glfwGetTime());
+}
 
 
 void BluePainting::render(GLuint VAO) {
@@ -58,7 +64,7 @@ void BluePainting::render(GLuint VAO) {
 
     //set up the shaders, uniforms
     pshader.begin();
-    pshader.uniformMatrix4fv("viewMatrix", viewMatrix);
+    updateUniforms();
 
     ms.push(ms.top());
         ms.top() = glm::translate(ms.top(), position);
