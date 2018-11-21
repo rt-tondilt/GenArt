@@ -93,6 +93,8 @@ void shader_prog::setup() {
     glAttachShader(prog, fragment_shader);
     //link
     glLinkProgram(prog);
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
 }
 
 void shader_prog::begin() {

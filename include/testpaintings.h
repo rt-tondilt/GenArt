@@ -13,5 +13,6 @@ class RedPainting: public Painting {
 class BluePainting: public Painting {
     public:
         BluePainting();
+        void updateUniforms();
         void render(GLuint VAO);
 };

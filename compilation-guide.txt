@@ -1,0 +1,8 @@
+Since we have used c++ assigment code as a basis for development, windows compilation is very similar to c++ assigment compilation with code::blocks.
+
+1. Clone the repository.
+2. Open the .cbp file with codeblocks.
+3. Set your compiler to use c++14 (or more recent).
+4. Build and run.
+
+So far there is a simple 3d environment, wasd+mouselook movement, and some framework + example classes for shader development.
