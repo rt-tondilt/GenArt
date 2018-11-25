@@ -7,6 +7,7 @@
 #include <unistd.h>         // Threading
 #include <stdio.h>          // Input/Output
 #include <GLEW/glew.h>      // OpenGL Extension Wrangler -
+//#include <GL/glew.h> // this is the default include folder location in ubuntu...
 #include <GLFW/glfw3.h>     // Windows and input
 #include <glm/glm.hpp>      // OpenGL math library
 

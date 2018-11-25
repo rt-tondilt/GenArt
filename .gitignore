@@ -5,6 +5,7 @@
 # include/GLEW
 
 # Build results
+GenArt
 out
 obj
 bin
