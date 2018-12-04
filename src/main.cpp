@@ -13,6 +13,7 @@
 
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
 #include "testpaintings.h"
+#include "simplepainting.h"
 #include "input.h"
 #include "camera.h"
 
@@ -36,10 +37,10 @@ void drawWorld();
 
 vector<unique_ptr<Painting>> makePaintings() {
     //just making and placing them manually...
-    auto blue = make_unique<BluePainting>();
+    auto blue = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/bluepainting.frag.glsl");
     blue->position = glm::vec3(-8.f, 0.f, -7.f);
 
-    auto red = make_unique<RedPainting>();
+    auto red = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/canvas.frag.glsl");
     red->position = glm::vec3(2.f, 0.f, -7.f);
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them

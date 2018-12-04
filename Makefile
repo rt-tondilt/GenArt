@@ -1,24 +1,23 @@
 CXX = g++
-
-HDRDIR = include
-SRCDIR = src
-OBJDIR = obj
 EXE = GenArt
-
-SRC = $(wildcard $(SRCDIR)/*.cpp)
-OBJ = $(SRC:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-CPPFLAGS = -I$(HDRDIR) -Wfatal-errors -Wall
+SRC = $(wildcard src/*.cpp)
+OBJ = $(SRC:src/%.cpp=build/%.o)
+DEP = $(OBJ:%.o=%.d)
+CPPFLAGS = -Iinclude -Wfatal-errors -Wall -MMD
 LDFLAGS = -Llib
 LDLIBS = -lglfw -lGLEW -lGL
 
 default: $(EXE)
 all: $(EXE)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) -c $< -o $@ $(CPPFLAGS)
 
 $(EXE): $(OBJ)
 	$(CXX) -o $(EXE) $(LDFLAGS) $(OBJ) $(LDLIBS)
+
+-include $(DEP)
+
+build/%.o: src/%.cpp
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 clean:
 	rm $(EXE) $(OBJ)
