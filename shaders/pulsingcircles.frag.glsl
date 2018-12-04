@@ -37,7 +37,7 @@ void main(void) {
 
     float c4 = circle(
         uv,
-        (0.2 + pow( abs( sin( PI * 0.5 + time)), 3.)) * 0.2,
+        (0.2 + pow( abs( sin( PI * 0.5 + time)), 3.)) * 0.2, // size function
         vec2(0.740,0.240)
     );
 
