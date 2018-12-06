@@ -37,25 +37,41 @@ void drawWorld();
 
 vector<unique_ptr<Painting>> makePaintings() {
     //just making and placing them manually...
-    auto blue = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/bluepainting.frag.glsl");
-    blue->position = glm::vec3(-8.f, 0.f, -7.f);
+    auto p1 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/gears.frag.glsl");
+    p1->position = glm::vec3(-18.f, 0.f, -7.f);
 
-    auto red = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/canvas.frag.glsl");
-    red->position = glm::vec3(2.f, 0.f, -7.f);
+    auto p2 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/canvas.frag.glsl");
+    p2->position = glm::vec3(2.f, 0.f, -7.f);
+
+    auto p3 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/ojgreen.frag.glsl");
+    p3->position = glm::vec3(22.f, 0.f, -7.f);
+
+    auto p4 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/psychconcentric.frag.glsl");
+    p4->position = glm::vec3(42.f, 0.f, -7.f);
+
+    auto p5 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/pulsingcircles.frag.glsl");
+    p5->position = glm::vec3(-38.f, 0.f, -7.f);
+
+    auto p6 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/bad_noise_pattern.frag.glsl");
+    p6->position = glm::vec3(-58.f, 0.f, -7.f);
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them
     vector<unique_ptr<Painting>> vec;
     vec.reserve(30);//should be enough to avoid resizing
 
-    vec.push_back(std::move(blue));
-    vec.push_back(std::move(red));
+    vec.push_back(std::move(p1));
+    vec.push_back(std::move(p2));
+    vec.push_back(std::move(p3));
+    vec.push_back(std::move(p4));
+    vec.push_back(std::move(p5));
+    vec.push_back(std::move(p6));
 
     return vec;
 }
 
 void initWalls() {
     floorVAO = createQuad(glm::vec3(0.22, 0.22, 0.22), 50);
-    paintingVAO = createQuad(glm::vec3(0.50, 0.50, 0.50), 4);
+    paintingVAO = createQuad(glm::vec3(0.50, 0.50, 0.50), 8);
 }
 
 GLuint createQuad(glm::vec3 color, float s) {

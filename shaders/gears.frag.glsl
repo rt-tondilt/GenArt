@@ -12,7 +12,7 @@ float gear(in vec2 _uv, in vec2 center, in float size, in float teeth, in float 
     _uv = center - _uv;
 	float r = length(_uv)*3.0; //radius
     float a = atan(_uv.y,_uv.x);//  this whole function gets "wrapped around" the center (cos(angle + (phaseshift * speed)))
-    float f = smoothstep(- .8, .7, cos(a*teeth + (floor(time) + pow(fract(time), 5.)) * 2 * PI * speed)) * 0.2 * teethsize * size + 0.5 * size;
+    float f = smoothstep(-.8, .7, cos(a*teeth + (floor(time) + pow(fract(time), 5.)) * 2 * PI * speed)) * 0.2 * teethsize * size + 0.5 * size;
     return 1.-smoothstep(f, f+0.02, r);
 }
 

@@ -1,4 +1,3 @@
-
 #version 400
 #extension GL_ARB_explicit_uniform_location : enable
 
@@ -29,17 +28,18 @@ vec2 pattern(in vec2 _uv, in float rnd) {
 void main(){
     vec2 uv = fraguv;
     uv *= 12.;
-    /* uv = (uv - 3.) * (abs(sin(time)) * 3.); */
-    uv.x += time ;
-    uv.y += sin(time) * 0.8;
+    uv = (uv - 3.) * (abs(sin(time)) + 1.);
+    uv.x += time * 8.;
+    uv.y += sin(time) * 3;
 
     vec2 ipos = floor(uv);
     vec2 fpos = fract(uv);
     vec2 tile = pattern(fpos, rand(ipos));
 
-    float color = step(tile.x , abs(sin(time * 0.3) - 0.04));
+    float color = step(tile.x, rand(vec2(abs(sin(time)*0.00000002)))) + rand(uv * sin(time));
+    color *= step(tile.y, rand(vec2(abs(cos(time)*0.00000002))));
 
-    fragColor = vec4(color, mix(rand(ipos), color, tile.x), 0., 1.0);
+    fragColor = vec4(color, 0., rand(ipos) * color *  0.5, 1.0);
 }
 
 
