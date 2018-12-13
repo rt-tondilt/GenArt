@@ -19,6 +19,7 @@
 #include "simplepainting.h"
 #include "input.h"
 #include "camera.h"
+#include "cylinder.h"
 
 // so far i've only added to this globals header globals which need to be visible across multiple files:
 // keyboard and cam
@@ -157,26 +158,27 @@ GLuint importMesh( const std::string& pFile ) {
 
     ////////////////////////////////////
 
+    float s = 10.f;
     std::vector<GLfloat> vertexdata;
     vertexdata.reserve(imported->mNumVertices * 5);
-    std::vector<GLuint> indices;
+    std::vector<GLubyte> indices;
 
     for (int i = 0; i < imported->mNumVertices; i++) {
-        vertexdata.push_back(imported->mVertices[i].x * 40);
-        vertexdata.push_back(imported->mVertices[i].y * 40);
-        vertexdata.push_back(imported->mVertices[i].z * 40);
+        vertexdata.push_back(imported->mVertices[i].x * 20);
+        vertexdata.push_back(imported->mVertices[i].y * 20);
+        vertexdata.push_back(imported->mVertices[i].z * 20);
         vertexdata.push_back(imported->mTextureCoords[0][i].x);
         vertexdata.push_back(imported->mTextureCoords[0][i].y);
+        /* printf("%f %f %f %f %f\n", imported->mVertices[i].x,imported->mVertices[i].y,imported->mVertices[i].z, imported->mTextureCoords[0][i].x, imported->mTextureCoords[0][i].y ); */
 
     }
-            // we know its triangles
+    // we know its triangles
     for (unsigned int i = 0; i < imported->mNumFaces; i++) {
         for (int j = 0; j < imported->mFaces[i].mNumIndices; j++){
-            //printf("%d %d, %d\n", i, j, imported->mFaces[i].mIndices[j]);
+            printf("%d %d, %d\n", i, j, imported->mFaces[i].mIndices[j]);
             indices.push_back((GLuint)imported->mFaces[i].mIndices[j]);
         }
     }
-
 
     GLuint vertexArrayHandle;
     glGenVertexArrays(1, &vertexArrayHandle);
@@ -275,6 +277,9 @@ int main(int argc, char *argv[]) {
     auto paintings = makePaintings();
     double currentTime, dt, lastTime = 0;
 
+    auto cylshader = make_unique<Cylinder>();
+    cylshader->position = glm::vec3(-60.f, 0.f, -7.f);
+
 
     while (!glfwWindowShouldClose(win)) {
         currentTime = glfwGetTime();
@@ -290,6 +295,8 @@ int main(int argc, char *argv[]) {
         for (const auto &p : paintings) {
             p->render(paintingVAO);
         }
+
+        cylshader->render(cylinderVAO);
 
 
         glfwSwapBuffers(win);

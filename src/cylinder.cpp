@@ -1,10 +1,11 @@
 
 #include "cylinder.h"
+#include "consts.h"
 #include <stack>
 
 Cylinder::Cylinder() :
     // calls the base class constructor: this is the important part: change your shaders here
-    Painting(shader_prog("shaders/cyl.vert.glsl", "shaders/cyl.frag.glsl"))
+    Painting(shader_prog("shaders/cyl.vert.glsl", "shaders/boringsines.frag.glsl"))
     {
         /////////////
         //this setup call MUST be inside the derived class constructor:
@@ -30,6 +31,7 @@ void Cylinder::render(GLuint VAO) {
     //but in principle you can store the objects VAO inside it as well, and it'll probably be more convenient
     pshader.begin();
     pshader.uniformMatrix4fv("viewMatrix", viewMatrix);
+    glUniform1f(TIME_LOC, (float)glfwGetTime());
 
     ms.push(ms.top());
         ms.top() = glm::translate(ms.top(), position);

@@ -29,7 +29,6 @@ void SimplePainting::render(GLuint VAO) {
     //but in principle you can store the objects VAO inside it as well, and it'll probably be more convenient
     pshader.begin();
     pshader.uniformMatrix4fv("viewMatrix", viewMatrix);
-    pshader.uniform1f("time", (float)glfwGetTime());
     glUniform1f(2, (float)glfwGetTime());
 
     ms.push(ms.top());
