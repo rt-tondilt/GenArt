@@ -11,6 +11,8 @@
 #include <GLFW/glfw3.h>     // Windows and input
 #include <glm/glm.hpp>      // OpenGL math library
 #include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
 #include "testpaintings.h"
@@ -28,13 +30,14 @@ using std::make_unique;
 
 //our globals
 shader_prog basicshader("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
-GLuint floorVAO, paintingVAO;
+GLuint floorVAO, paintingVAO, cylinderVAO;
 
 // all functions defined in main.cpp... it's ugly but i'm ok with it //
 GLuint createQuad(glm::vec3 color, float s);
 vector<unique_ptr<Painting>> makePaintings();
-void initWalls();
+void initGeom();
 void drawWorld();
+GLuint importMesh(const std::string& pFile);
 
 vector<unique_ptr<Painting>> makePaintings() {
     //just making and placing them manually...
@@ -53,6 +56,7 @@ vector<unique_ptr<Painting>> makePaintings() {
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them
     vector<unique_ptr<Painting>> vec;
+    vec.reserve(30);//should be enough to avoid resizing
 
     for (int i = 0; i < fragshaders.size(); i++) {
         auto p = make_unique<SimplePainting>("shaders/basic.vert.glsl",fragshaders[i]);
@@ -60,14 +64,15 @@ vector<unique_ptr<Painting>> makePaintings() {
         vec.push_back(std::move(p));
     }
 
-    vec.reserve(30);//should be enough to avoid resizing
 
     return vec;
 }
 
-void initWalls() {
+void initGeom() {
     floorVAO = createQuad(glm::vec3(0.22, 0.22, 0.22), 50);
     paintingVAO = createQuad(glm::vec3(0.50, 0.50, 0.50), 8);
+    cylinderVAO = importMesh("data/cylinder.obj");
+
 }
 
 GLuint createQuad(glm::vec3 color, float s) {
@@ -91,8 +96,8 @@ GLuint createQuad(glm::vec3 color, float s) {
     glGenBuffers(1, &vboHandle);
     glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexdata), vertexdata, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
 
+    glEnableVertexAttribArray(VERTEX_POSITION_LOC);
     //indexes are defined inside the vertex shader itself with layout specification
     glVertexAttribPointer(
         VERTEX_POSITION_LOC,
@@ -102,7 +107,7 @@ GLuint createQuad(glm::vec3 color, float s) {
         8*sizeof(float),                 // no extra data between each position
         (const GLvoid*)(0*sizeof(float))                  // offset of first element
     );
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(COLOR_LOC);
     glVertexAttribPointer(
         COLOR_LOC,
         3,
@@ -111,7 +116,7 @@ GLuint createQuad(glm::vec3 color, float s) {
         8*sizeof(float),
         (const GLvoid*)(3*sizeof(float))
     );
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(UV_LOC);
     glVertexAttribPointer(
         UV_LOC,
         2,
@@ -121,11 +126,91 @@ GLuint createQuad(glm::vec3 color, float s) {
         (const GLvoid*)(6*sizeof(float))
     );
 
-    // First step. We create a handle for our buffer
     glGenBuffers(1, &vboHandle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboHandle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLfloat)*6, indices, GL_STATIC_DRAW);
     //We return handle to vertex array.
+    return vertexArrayHandle;
+}
+
+
+GLuint importMesh( const std::string& pFile ) {
+    Assimp::Importer importer;
+
+    const aiScene *scene = importer.ReadFile(pFile,
+        aiProcess_CalcTangentSpace       |
+        aiProcess_Triangulate            |
+        aiProcess_JoinIdenticalVertices  |
+        aiProcess_SortByPType);
+
+    if (!scene){
+        printf("Error importing a file: %s\n", importer.GetErrorString());
+        return 0;
+    }
+
+    printf("Loaded mesh: %s \n", scene->mMeshes[0][0].mName.C_Str());
+
+    aiMesh *imported = scene->mMeshes[0];
+    printf("ptr to mesh gotten\n");
+    printf("number of vertices: %d, number of faces: %d\n", imported->mNumVertices, imported->mNumFaces);
+
+
+    ////////////////////////////////////
+
+    std::vector<GLfloat> vertexdata;
+    vertexdata.reserve(imported->mNumVertices * 5);
+    std::vector<GLuint> indices;
+
+    for (int i = 0; i < imported->mNumVertices; i++) {
+        vertexdata.push_back(imported->mVertices[i].x * 40);
+        vertexdata.push_back(imported->mVertices[i].y * 40);
+        vertexdata.push_back(imported->mVertices[i].z * 40);
+        vertexdata.push_back(imported->mTextureCoords[0][i].x);
+        vertexdata.push_back(imported->mTextureCoords[0][i].y);
+
+    }
+            // we know its triangles
+    for (unsigned int i = 0; i < imported->mNumFaces; i++) {
+        for (int j = 0; j < imported->mFaces[i].mNumIndices; j++){
+            //printf("%d %d, %d\n", i, j, imported->mFaces[i].mIndices[j]);
+            indices.push_back((GLuint)imported->mFaces[i].mIndices[j]);
+        }
+    }
+
+
+    GLuint vertexArrayHandle;
+    glGenVertexArrays(1, &vertexArrayHandle);
+    glBindVertexArray(vertexArrayHandle);
+
+    GLuint vboHandle;
+    glGenBuffers(1, &vboHandle);
+    glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*vertexdata.size(), &vertexdata[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(VERTEX_POSITION_LOC);
+    //indexes are defined inside the vertex shader itself with layout specification
+    glVertexAttribPointer(
+        VERTEX_POSITION_LOC,
+        3,                 // number of elements per vertex, here
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        5*sizeof(GLfloat),
+        (const GLvoid*)(0*sizeof(GLfloat))                  // offset of first element
+    );
+
+    glEnableVertexAttribArray(UV_LOC);
+    glVertexAttribPointer(
+        UV_LOC,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        5*sizeof(GLfloat),
+        (const GLvoid*)(3*sizeof(GLfloat))
+    );
+
+    glGenBuffers(1, &vboHandle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboHandle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLfloat)*indices.size(), &indices[0], GL_STATIC_DRAW);
     return vertexArrayHandle;
 }
 
@@ -138,7 +223,6 @@ void drawWorld() {
     ms.push(ms.top()); //Floor
         ms.top() = glm::rotate(ms.top(), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
         ms.top() = glm::translate(ms.top(), glm::vec3(0.0, 0.0, -10.0));
-
         basicshader.uniformMatrix4fv("modelMatrix", ms.top());
         glBindVertexArray(floorVAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
@@ -181,7 +265,7 @@ int main(int argc, char *argv[]) {
     basicshader.uniformMatrix4fv("projectionMatrix", cam.projection);
     basicshader.uniformMatrix4fv("viewMatrix", cam.view);
 
-    initWalls();
+    initGeom();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -191,6 +275,7 @@ int main(int argc, char *argv[]) {
     auto paintings = makePaintings();
     double currentTime, dt, lastTime = 0;
 
+
     while (!glfwWindowShouldClose(win)) {
         currentTime = glfwGetTime();
         dt = (currentTime - lastTime);
@@ -199,11 +284,13 @@ int main(int argc, char *argv[]) {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
         drawWorld();
 
         for (const auto &p : paintings) {
             p->render(paintingVAO);
         }
+
 
         glfwSwapBuffers(win);
         glfwPollEvents();

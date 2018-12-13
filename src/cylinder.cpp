@@ -1,9 +1,10 @@
-#include "simplepainting.h"
+
+#include "cylinder.h"
 #include <stack>
 
-SimplePainting::SimplePainting( const char* vshaderpath, const char* fshaderpath ) :
+Cylinder::Cylinder() :
     // calls the base class constructor: this is the important part: change your shaders here
-    Painting(shader_prog(vshaderpath, fshaderpath))
+    Painting(shader_prog("shaders/cyl.vert.glsl", "shaders/cyl.frag.glsl"))
     {
         /////////////
         //this setup call MUST be inside the derived class constructor:
@@ -19,7 +20,7 @@ SimplePainting::SimplePainting( const char* vshaderpath, const char* fshaderpath
         pshader.end();
     };
 
-void SimplePainting::render(GLuint VAO) {
+void Cylinder::render(GLuint VAO) {
     std::stack<glm::mat4> ms;
     ms.push(glm::mat4(1.0));
 
@@ -29,8 +30,6 @@ void SimplePainting::render(GLuint VAO) {
     //but in principle you can store the objects VAO inside it as well, and it'll probably be more convenient
     pshader.begin();
     pshader.uniformMatrix4fv("viewMatrix", viewMatrix);
-    pshader.uniform1f("time", (float)glfwGetTime());
-    glUniform1f(2, (float)glfwGetTime());
 
     ms.push(ms.top());
         ms.top() = glm::translate(ms.top(), position);
@@ -38,7 +37,7 @@ void SimplePainting::render(GLuint VAO) {
         //maybe we can even set up the modelMatrix only once in constructor as well if they don't move around
         pshader.uniformMatrix4fv("modelMatrix", ms.top());
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+        glDrawElements(GL_TRIANGLES, 192, GL_UNSIGNED_BYTE, 0);
     ms.pop();
     pshader.end();
 };
