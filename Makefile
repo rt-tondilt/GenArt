@@ -5,7 +5,7 @@ OBJ = $(SRC:src/%.cpp=build/%.o)
 DEP = $(OBJ:%.o=%.d)
 CPPFLAGS = -Iinclude -Wfatal-errors -Wall -MMD
 LDFLAGS = -Llib
-LDLIBS = -lglfw -lGLEW -lGL
+LDLIBS = -lglfw -lGLEW -lGL -lassimp
 
 default: $(EXE)
 all: $(EXE)

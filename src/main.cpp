@@ -10,6 +10,7 @@
 //#include <GL/glew.h> // this is the default include folder location in ubuntu...
 #include <GLFW/glfw3.h>     // Windows and input
 #include <glm/glm.hpp>      // OpenGL math library
+#include <assimp/Importer.hpp>
 
 #include "shader_util.h"    // Utility methods to keep this file a bit shorter.
 #include "testpaintings.h"
@@ -29,7 +30,7 @@ using std::make_unique;
 shader_prog basicshader("shaders/basic.vert.glsl", "shaders/basic.frag.glsl");
 GLuint floorVAO, paintingVAO;
 
-// all functions defined in main.cpp //
+// all functions defined in main.cpp... it's ugly but i'm ok with it //
 GLuint createQuad(glm::vec3 color, float s);
 vector<unique_ptr<Painting>> makePaintings();
 void initWalls();
@@ -37,34 +38,29 @@ void drawWorld();
 
 vector<unique_ptr<Painting>> makePaintings() {
     //just making and placing them manually...
-    auto p1 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/gears.frag.glsl");
-    p1->position = glm::vec3(-18.f, 0.f, -7.f);
 
-    auto p2 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/canvas.frag.glsl");
-    p2->position = glm::vec3(2.f, 0.f, -7.f);
-
-    auto p3 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/ojgreen.frag.glsl");
-    p3->position = glm::vec3(22.f, 0.f, -7.f);
-
-    auto p4 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/psychconcentric.frag.glsl");
-    p4->position = glm::vec3(42.f, 0.f, -7.f);
-
-    auto p5 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/pulsingcircles.frag.glsl");
-    p5->position = glm::vec3(-38.f, 0.f, -7.f);
-
-    auto p6 = make_unique<SimplePainting>("shaders/basic.vert.glsl", "shaders/bad_noise_pattern.frag.glsl");
-    p6->position = glm::vec3(-58.f, 0.f, -7.f);
+    vector<const char*> fragshaders{
+        "shaders/bad_noise_pattern.frag.glsl",
+        "shaders/pulsingcircles.frag.glsl",
+        "shaders/psychconcentric.frag.glsl",
+        "shaders/ojgreen.frag.glsl",
+        "shaders/canvas.frag.glsl",
+        "shaders/gears.frag.glsl",
+        "shaders/rainy.frag.glsl",
+        "shaders/boringsines.frag.glsl",
+        "shaders/dotclock.frag.glsl"
+    };
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them
     vector<unique_ptr<Painting>> vec;
-    vec.reserve(30);//should be enough to avoid resizing
 
-    vec.push_back(std::move(p1));
-    vec.push_back(std::move(p2));
-    vec.push_back(std::move(p3));
-    vec.push_back(std::move(p4));
-    vec.push_back(std::move(p5));
-    vec.push_back(std::move(p6));
+    for (int i = 0; i < fragshaders.size(); i++) {
+        auto p = make_unique<SimplePainting>("shaders/basic.vert.glsl",fragshaders[i]);
+        p->position = glm::vec3(-40.f+i*20, 0.f, -7.f);
+        vec.push_back(std::move(p));
+    }
+
+    vec.reserve(30);//should be enough to avoid resizing
 
     return vec;
 }
