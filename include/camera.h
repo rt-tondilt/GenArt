@@ -12,7 +12,7 @@ class Camera {
         glm::mat4 view;
         GLFWwindow *win;
         const float walkspeed = 4.f;
-        const float runspeed = 10.f;
+        const float runspeed = 30.f;
         std::map<int, bool> keyboard;
         double mx = 0, my = 0;
 

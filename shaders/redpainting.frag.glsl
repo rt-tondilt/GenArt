@@ -8,7 +8,6 @@ out vec4 fragColor;
 void main(void) {
     vec2 uv = fraguv;
 
-    uv *= 5.;
     if (fract(uv.y * 0.5) > 0.5) {
         uv.x += fract(time);
     } else {
@@ -16,7 +15,5 @@ void main(void) {
     }
     uv = fract(uv);//tile
 
-
     fragColor = vec4(uv, 0.0, 1.0);
-
 }
