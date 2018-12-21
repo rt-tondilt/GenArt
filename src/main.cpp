@@ -54,6 +54,7 @@ vector<unique_ptr<Painting>> makePaintings() {
         "shaders/boringsines.frag.glsl",
         "shaders/dotclock.frag.glsl",
         "shaders/joydivision.frag.glsl"
+
     };
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them

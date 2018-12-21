@@ -2,7 +2,7 @@
 #extension GL_ARB_explicit_uniform_location : enable
 
 const float PI = 3.1415926535897932384626433832795;
-const float N = 7.;
+const float N = 10.;
 
 
 layout(location = 2) uniform float time;
@@ -31,11 +31,12 @@ void main( void ) {
 	float f = 0.;
 	for (float i = 1.; i <= N; i++){
 
-		float lengthwise = uv.x * (30. + 5.*i) - time * i * 1.5;
-		float amplitude = 0.16 - 0.02 * i;
-		float yshift = 0.85 - 0.08 * i;
-		float linewidth = 0.01 - 0.0011 * i;
-		f += makeline( noise(lengthwise)*amplitude + yshift, linewidth, uv);
+		float lengthwise = uv.x * 30 + time;
+		float x = (0.5 - uv.x) * 2.;
+		float amplitude = (0.16 - 0.005 * i) * pow(min(cos(PI * x / 2.), 1. - abs(x)), 4.);
+		float yshift = 0.7 - 0.06 * i;
+		float linewidth = 0.01 - 0.0001 * i;
+		f += makeline( noise(lengthwise * i)*amplitude + yshift, linewidth, uv);
 	}
 
 	vec3 color = vec3(0., .8, .3) * f;

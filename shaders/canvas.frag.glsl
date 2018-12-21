@@ -30,8 +30,8 @@ float colrand(float seed) {
 void main() {
     vec2 uv = fraguv;
     uv = (uv * 2.) - 1.;
-    float step = mod(floor(time/2.), 30.) + 1.;
-    uv *= 0.25 * step;
+    float step = mod(floor(time * 2), 45.) + 1.;
+    uv *= 0.1 * step;
 
     vec2 fc = fract(uv) * 2. - 1.;
     vec2 fi = floor(uv);
