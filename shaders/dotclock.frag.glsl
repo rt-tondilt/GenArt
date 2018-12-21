@@ -11,7 +11,7 @@ out vec4 fragColor;
 
 
 void main( void ) {
-	vec2 pos = fraguv * 2. - 1.;
+	vec2 pos = fraguv * 2. - 1.; // -1 to 1
 	vec2 pos2 = pos, pos3 = pos;
 	float col=0.0, col2=0.0, col3=0.0;
 

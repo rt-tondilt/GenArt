@@ -153,7 +153,6 @@ GLuint importMesh( const std::string& pFile ) {
     printf("Loaded mesh: %s \n", scene->mMeshes[0][0].mName.C_Str());
 
     aiMesh *imported = scene->mMeshes[0];
-    printf("ptr to mesh gotten\n");
     printf("number of vertices: %d, number of faces: %d\n", imported->mNumVertices, imported->mNumFaces);
 
 
@@ -170,13 +169,11 @@ GLuint importMesh( const std::string& pFile ) {
         vertexdata.push_back(imported->mVertices[i].z * 20);
         vertexdata.push_back(imported->mTextureCoords[0][i].x);
         vertexdata.push_back(imported->mTextureCoords[0][i].y);
-        /* printf("%f %f %f %f %f\n", imported->mVertices[i].x,imported->mVertices[i].y,imported->mVertices[i].z, imported->mTextureCoords[0][i].x, imported->mTextureCoords[0][i].y ); */
 
     }
     // we know its triangles
     for (unsigned int i = 0; i < imported->mNumFaces; i++) {
         for (int j = 0; j < imported->mFaces[i].mNumIndices; j++){
-            printf("%d %d, %d\n", i, j, imported->mFaces[i].mIndices[j]);
             indices.push_back((GLuint)imported->mFaces[i].mIndices[j]);
         }
     }
@@ -279,7 +276,8 @@ int main(int argc, char *argv[]) {
     double currentTime, dt, lastTime = 0;
 
     auto cylshader = make_unique<Cylinder>();
-    cylshader->position = glm::vec3(-60.f, 0.f, -7.f);
+    cylshader->position = glm::vec3(0.f, 10.f, 30.f);
+    cylshader->angle = 90.;
 
 
     while (!glfwWindowShouldClose(win)) {
