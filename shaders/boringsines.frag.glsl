@@ -13,9 +13,9 @@ out vec4 fragColor;
 
 void main(){
     vec2 uv = fraguv;
-	uv.x *= uv.x * 3.;
+	uv.x *= 3.;
 	uv = fract(uv);
-	uv = uv * 2. * PI - PI;//make tiles from -uvi to uvi
+	uv = uv * 2. * PI - PI;//make tiles from -PI to PI
 	uv.y *= 0.6;
 
 	vec3 line = vec3(0.0);

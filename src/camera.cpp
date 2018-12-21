@@ -1,18 +1,18 @@
 #include "camera.h"
 
     Camera::Camera() ://default constructor
-        projection(glm::perspective(glm::radians(80.), 4./3., 0.1, 100.)),
         worldpos(glm::vec3(3.f, 6.f, 15.f)),
         rotation(glm::vec2(0.f, 0.f)),
+        projection(glm::perspective(glm::radians(80.), 4./3., 0.1, 100.)),
         view(glm::mat4(1.f))
         {
             initKeyboard();
         }
 
     Camera::Camera(glm::mat4 projection) ://with custom projection matrix
-        projection(projection),
         worldpos(glm::vec3(3.f, 6.f, 15.f)),
         rotation(glm::vec2(0.f, 90.f)),
+        projection(projection),
         view(glm::mat4(1.f))
         {
             initKeyboard();

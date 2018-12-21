@@ -54,6 +54,7 @@ vector<unique_ptr<Painting>> makePaintings() {
         "shaders/boringsines.frag.glsl",
         "shaders/dotclock.frag.glsl",
         "shaders/trigonometric_modulus.frag.glsl",
+        "shaders/joydivision.frag.glsl",
     };
 
     //can't use a vector initializer {} because unique_ptr can't be copied... therefore we gotta pushback them
@@ -62,7 +63,7 @@ vector<unique_ptr<Painting>> makePaintings() {
 
     for (int i = 0; i < fragshaders.size(); i++) {
         auto p = make_unique<SimplePainting>("shaders/basic.vert.glsl",fragshaders[i]);
-        p->position = glm::vec3(-40.f+i*20, 0.f, -7.f);
+        p->position = glm::vec3(-80.f+i*40, 10.f, -30.f);
         vec.push_back(std::move(p));
     }
 
@@ -72,7 +73,7 @@ vector<unique_ptr<Painting>> makePaintings() {
 
 void initGeom() {
     floorVAO = createQuad(glm::vec3(0.22, 0.22, 0.22), 50);
-    paintingVAO = createQuad(glm::vec3(0.50, 0.50, 0.50), 8);
+    paintingVAO = createQuad(glm::vec3(0.50, 0.50, 0.50), 15);
     cylinderVAO = importMesh("data/cylinder.obj");
 
 }
